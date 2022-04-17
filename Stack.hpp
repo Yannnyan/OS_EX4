@@ -32,7 +32,28 @@ namespace ex4
             // get the next node.
             str_Node * getNext(){return this->next;}
             // set the next node.
-            void setNext(string & next){this -> next = new str_Node(next);}
+            void setNext(string & next) // 
+            {
+                if (this -> next != NULL)
+                {
+                    
+                }
+                else
+                {
+                    this -> next = new str_Node(next);
+                }
+            }
+            void setNext(str_Node * next)
+            {
+                if (this -> next != NULL)
+                {
+                    
+                }
+                else
+                {
+                    this -> next = next;
+                } 
+            }
             // get the data of the node
             string & getData(){return this->data;}
             // set the data of the node
@@ -43,6 +64,7 @@ namespace ex4
         private:
             str_Node * head;
             size_t size;
+            pthread_mutex_t lock;
 
         public:
             // constructor initializes stack size to 10
@@ -50,7 +72,7 @@ namespace ex4
             // destructor, destroys the array
             ~Stack();
             // push text into the stack
-            void PUSH(const string & text); 
+            void PUSH(string & text); 
             // pop text from the stack
             string POP(); 
             // return the first string from the stack 
@@ -66,10 +88,6 @@ namespace ex4
             // get pointer to the head of the stack
             str_Node * get_head(){return this->head;}
             
-           
-
-
-
     };
 }
 

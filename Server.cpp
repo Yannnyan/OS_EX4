@@ -16,10 +16,18 @@
 #include <signal.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include "Stack.hpp"
 
 #define PORT "3490"  // the port users will be connecting to
 
 #define BACKLOG 10   // how many pending connections queue will hold
+ 
+#define BUFFERSIZE 1024
+
+using namespace std;
+
+ex4::Stack stack;
+
 
 void sigchld_handler(int s)
 {
@@ -42,11 +50,57 @@ void *get_in_addr(struct sockaddr *sa)
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
 
+string convertArrToString(char inp[BUFFERSIZE])
+{
+    string str;
+    for (int i=0; i< BUFFERSIZE; i++)
+    {
+        str.push_back(inp[i]);
+    }
+    return str;
+}
+
+void handleCall(char inp[BUFFERSIZE])
+{
+    string str = convertArrToString(inp);
+    cout << inp << endl;
+    if (str.at(0) == 'p')
+    {
+        stack.PUSH(str);
+        cout << "pushed into stack" << endl;
+    }
+    else if (str.at(0) == 't')
+    {
+        cout << stack.TOP() << endl;
+    }
+    else if (str.at(0) == 'P')
+    {
+        cout << stack.POP() << endl;
+    }
+}
+
 void * thread_func(void * args)
 {
     int new_sockfd = *(int*) args;
-    if (send(new_sockfd, "Hello, world!", 13, 0) == -1)
-        perror("send");
+    char buffer[BUFFERSIZE];
+    memset(buffer, 0, BUFFERSIZE);
+    int r = 0;
+    while(1)
+    {
+        if ((r = recv(new_sockfd, buffer , BUFFERSIZE, 0)) == 0  || r == -1)
+        {
+            perror("ERROR: recved 0 or -1 from recv");
+            exit(1);
+        }
+        handleCall(buffer);
+        if ( (r = send(new_sockfd, buffer, BUFFERSIZE, 0)) == 0  || r == -1 )
+        {
+            perror("ERROR: recved 0 or -1 from send ");
+            exit(1);
+        }
+        memset(buffer, 0, BUFFERSIZE);
+    }
+    
     close(new_sockfd);
     pthread_exit(NULL);
 

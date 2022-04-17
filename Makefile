@@ -1,25 +1,26 @@
 
 CC = g++
 CFLAGS = -Wall -g -std=gnu99 -pthread
-OBJECTS = myServer.o
-OBJECTS2 = originServer.o
-OBJECTS3 = originClient.o
+DEPS = Stack.hpp
+OBJECTS = Server.o Stack.o
+OBJECTS1 = Client.o Stack.o
+OBJECTS_MAIN = main.o Stack.o
 
-myServer: $(OBJECTS)
+main : $(OBJECTS_MAIN)
+	$(CC) -o $@ $(OBJECTS1) $(CFLAGS)
+
+myServer: $(OBJECTS) 
 	$(CC) -o $@ $^ $(CFLAGS)
 
-originServer: $(OBJECTS2)
+Client: $(OBJECTS1)
 	$(CC) -o $@ $^ $(CFLAGS)
 
-originClient: $(OBJECTS3)
-	$(CC) -o $@ $^ $(CFLAGS)
-
-%.o: %.c
+%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 .PHONY: clean
 
 clean: 
-	rm -f myServer originClient originServer *.o
+	rm -f myServer Client myServer main *.o
 
 

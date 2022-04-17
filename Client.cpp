@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <iostream>
 
 #include <arpa/inet.h>
 
@@ -18,6 +19,7 @@
 
 #define MAXDATASIZE 100 // max number of bytes we can get at once 
 
+#define BUFFERSIZE 1024
 // get sockaddr, IPv4 or IPv6:
 void *get_in_addr(struct sockaddr *sa)
 {
@@ -78,14 +80,34 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
-        perror("recv");
-        exit(1);
+    std::string temp;
+    char str[BUFFERSIZE];
+    while (1)
+    {
+        memset(str, 0, BUFFERSIZE);
+        std::cin >> temp;
+        if (temp.size() > BUFFERSIZE)
+        {
+            fprintf(stdout, "ERROR: cant send more than %d",BUFFERSIZE);
+            continue;
+        }
+        if ((numbytes = send(sockfd, str, BUFFERSIZE, 0)) == 0 || numbytes == -1)
+        {
+            perror("send");
+            exit(1);
+        }
+        if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+            perror("recv");
+            exit(1);
+        }
+        buf[numbytes] = '\0';
+        printf("client: received '%s'\n",buf);
+
     }
 
-    buf[numbytes] = '\0';
+    
+    
 
-    printf("client: received '%s'\n",buf);
 
     close(sockfd);
 
