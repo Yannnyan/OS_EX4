@@ -32,7 +32,7 @@ namespace ex4
             // get the next node.
             str_Node * getNext(){return this->next;}
             // set the next node.
-            void setNext(string * next){this -> next = next;}
+            void setNext(string & next){this -> next = new str_Node(next);}
             // get the data of the node
             string & getData(){return this->data;}
             // set the data of the node
