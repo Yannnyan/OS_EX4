@@ -4,9 +4,9 @@ CFLAGS = -Wall -g -std=gnu99 -pthread
 DEPS = heap_funcs.hpp dectest.h Stack.hpp
 OBJECTS = Server.o Stack.o
 OBJECTS1 = Client.o Stack.o
-OBJECTS_TEST_Server = Stack.o Server.o heap_funcs.o Test.o
-OBJECTS_TEST_Client = Stack.o Client.o Test.o
-OBJECTS_TEST_HEAP = heap_funcs.o Stack.o Test.o
+OBJECTS_TEST_Server = Stack.o Server.o heap_funcs.o TestServer.o
+OBJECTS_TEST_Client = Stack.o Client.o TestClient.o
+OBJECTS_TEST_HEAP = heap_funcs.o Stack.o TestHeap.o 
 OBJECTS_MAIN = main.o Stack.o
 
 
@@ -19,7 +19,8 @@ testServer : $(OBJECTS_TEST_Server)
 
 # add testClient
 
-# add testHeap
+testHeap : TestRunner.o $(OBJECTS_TEST_HEAP) 
+	$(CC) -o $@ TestRunner.o $(OBJECTS_TEST_HEAP) $(CFLAGS)
 
 myServer: $(OBJECTS) 
 	$(CC) -o $@ $^ $(CFLAGS)

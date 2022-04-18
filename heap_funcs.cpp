@@ -34,15 +34,16 @@ void * _malloc(size_t size)
     // set current to the top of the list
     block * current = head;
     // iterate while current is not null
-    while(current)
+    while(current != NULL)
     {
         // if the block is free and the size is enough then return the address for the allocated memory
         if (current->free && current->size >= size)
         {
             // found a good block, set that the block is ocupied and return it's address
             current->free = 0;
-            return (current + BLOCK_SIZE);
+            return (current + 1);
         }
+        current = current->next;
     }
     // if we couldn't find a block that is good, then alocate new block in the heap
     if (sbrk(BLOCK_SIZE + size) == (void *) -1 )
@@ -57,7 +58,7 @@ void * _malloc(size_t size)
     head = newhead;
     pthread_mutex_unlock(&lock);
     // lastly return the block
-    return addr + BLOCK_SIZE;
+    return newhead + 1;
 }
 
 
