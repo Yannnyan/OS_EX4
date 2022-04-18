@@ -104,7 +104,7 @@ void _free(void * ptr)
 
 
 
-void * calloc(size_t member_num, size_t member_size)
+void * _calloc(size_t member_num, size_t member_size)
 {
     // ensure thread safety for the call for calloc
     std::lock_guard<std::mutex> lock(_mutex);

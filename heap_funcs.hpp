@@ -11,4 +11,4 @@ typedef struct block
 
 void * _malloc(size_t size);
 void _free(void * addr);
-
+void * _calloc(size_t member_num, size_t member_size);
