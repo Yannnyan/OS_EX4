@@ -34,6 +34,6 @@ Client: $(OBJECTS1)
 .PHONY: clean
 
 clean: 
-	rm -f myServer Client myServer main *.o
+	rm -f myServer Client myServer main testHeap testServer testClient *.o
 
 
