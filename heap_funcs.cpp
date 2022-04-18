@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <mutex>
 #include "heap_funcs.hpp"
+#include <string.h>
 
 std::mutex _mutex;
 
@@ -100,5 +101,24 @@ void _free(void * ptr)
     // else set the block to be freed
     block_address->free = 1;
 }
+
+
+
+void * calloc(size_t member_num, size_t member_size)
+{
+    // ensure thread safety for the call for calloc
+    std::lock_guard<std::mutex> lock(_mutex);
+    size_t size = member_num * member_size;
+    void * addr = _malloc(size);
+    if (addr == NULL)
+    {
+        return NULL;
+    }
+    memset(addr, 0, size);
+    return addr;
+}
+
+
+
 
 
