@@ -9,12 +9,12 @@
 pthread_mutex_t lock;
 
 
-typedef struct block
-{
-    size_t size; // 8
-    int free; // 4
-    block * next; // 8
-}block;
+// typedef struct block
+// {
+//     size_t size; // 8
+//     int free; // 4
+//     block * next; // 8
+// }block;
 
 block * head = NULL;
 
@@ -39,7 +39,7 @@ void * _malloc(size_t size)
     while((*current) != NULL)
     {
         // if the block is free and the size is enough then return the address for the allocated memory
-        if ((*current)->free && (*current)->size >= size)
+        if ( ((*current)->free) && ((*current)->size ) >= size)
         {
             // found a good block, set that the block is ocupied and return it's address
             (*current)->free = 0;
@@ -76,7 +76,7 @@ void _free(void * ptr)
     // storing variable with the address
     block * block_address = (block *) ptr;
     // getting the address of the block
-    block_address -= 1;
+    block_address = block_address - 1;
     // checking if the block exists inside the linked list, if not then it's probably defined on the stack so, cant free this block.
     int found = 0;
     block ** current = &head;
@@ -94,7 +94,7 @@ void _free(void * ptr)
         throw(std::invalid_argument("cannot free block that is not pointing to address on the heap."));
     }
     // if this block is already free then throw an exception
-    if ((block_address->free))
+    if ((block_address->free) == 1)
     {
         throw(std::invalid_argument("free already freed block."));
     }
