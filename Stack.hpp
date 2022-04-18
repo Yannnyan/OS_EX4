@@ -3,7 +3,6 @@
 #include <string>
 
 
-
 using namespace std;
 
 
@@ -18,46 +17,22 @@ namespace ex4
             
         public:
             // construct an empty node and set the next to null
-            str_Node()
-            {
-                this->next = NULL;
-            }
+            str_Node();
+            
             // construct a node and set its data to str
             // set next to null.
-            str_Node(const string & str)
-            {
-                this->data = str;
-                this->next = NULL;
-            }
+            str_Node(const string & str);
+            
             // get the next node.
-            str_Node * getNext(){return this->next;}
+            str_Node * getNext(); 
             // set the next node.
-            void setNext(string & next) // 
-            {
-                if (this -> next != NULL)
-                {
-                    
-                }
-                else
-                {
-                    this -> next = new str_Node(next);
-                }
-            }
-            void setNext(str_Node * next)
-            {
-                if (this -> next != NULL)
-                {
-                    
-                }
-                else
-                {
-                    this -> next = next;
-                } 
-            }
+            void setNext(string & next); 
+            
+            void setNext(str_Node * next);
             // get the data of the node
-            string & getData(){return this->data;}
+            string & getData();
             // set the data of the node
-            void setData(string data){this -> data = data;}
+            void setData(string data);
     };
     class Stack
     {

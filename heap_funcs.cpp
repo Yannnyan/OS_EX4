@@ -2,12 +2,10 @@
 #include <stdlib.h>
 #include <iostream>
 #include <unistd.h>
-#include <pthread.h>
-
+#include <mutex>
 #include "heap_funcs.hpp"
 
-pthread_mutex_t lock;
-
+std::mutex _mutex;
 
 // typedef struct block
 // {
@@ -24,11 +22,11 @@ block * head = NULL;
 // return NULL if the function fails or if size to alocate is 0
 void * _malloc(size_t size)
 {   
-    // pthread_mutex_lock(&lock);
+    // call to constructor with the object of mutex created, which lets it loose after return statement
+    std::lock_guard<std::mutex> lock(_mutex);
     // malloc with size 0 returns NULL
     if (size == 0)
     {
-        // pthread_mutex_unlock(&lock);
         return NULL;
     }
     // get the current address
@@ -58,7 +56,6 @@ void * _malloc(size_t size)
     newhead->size = size;
     newhead->free = 0;
     head = newhead;
-    // pthread_mutex_unlock(&lock);
     // lastly return the block
     return newhead + 1;
 }
@@ -67,6 +64,8 @@ void * _malloc(size_t size)
 // receiving the address the user wants to free
 void _free(void * ptr)
 {
+    // call to constructor with the object of mutex created, which lets it loose after return statement
+    std::lock_guard<std::mutex> lock(_mutex);
     // trying to free null pointer
     if (ptr == NULL)
     {

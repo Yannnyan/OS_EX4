@@ -1,9 +1,12 @@
 #include <string>
 #include <iostream>
 #include "Stack.hpp"
-#include <pthread.h>
+#include <mutex>
+
+std::mutex _mutex;
 
 using namespace ex4;
+using namespace std;
 ex4::Stack::Stack()
 {
     this -> head = new str_Node();
@@ -21,19 +24,76 @@ ex4::Stack::~Stack()
     }
 }   
 
+ex4::str_Node::str_Node()
+{
+    this->next = NULL;
+}
+// construct a node and set its data to str
+// set next to null.
+ex4::str_Node::str_Node(const string & str)
+{
+    this->data = str;
+    this->next = NULL;
+}
+// get the next node.
+str_Node * ex4::str_Node::getNext()
+{
+    lock_guard<mutex> lock(_mutex);
+    return this->next;
+}
+// set the next node.
+void ex4::str_Node::setNext(string & next)
+{
+    lock_guard<mutex> lock(_mutex);
+    if (this -> next != NULL)
+    {
+        
+    }
+    else
+    {
+        this -> next = new str_Node(next);
+    }
+}
+void ex4::str_Node::setNext(str_Node * next)
+{
+    lock_guard<mutex> lock(_mutex);
+    if (this -> next != NULL)
+    {
+        
+    }
+    else
+    {
+        this -> next = next;
+    } 
+}
+// get the data of the node
+string & ex4::str_Node::getData()
+{
+    lock_guard<mutex> lock(_mutex);
+    return this->data;
+}
+// set the data of the node
+void ex4::str_Node::setData(string data)
+{
+    lock_guard<mutex> lock(_mutex);
+    this -> data = data;
+}
+
+
+
+
 string ex4::Stack::POP()
 {
-    pthread_mutex_lock(&(this->lock));
+    lock_guard<mutex> lock(_mutex);
     str_Node * h = this->head;
     this->head = h->getNext();
     string str = h->getData();
     free(h);
-    pthread_mutex_unlock(&(this->lock));
     return str;
 }
 void ex4::Stack::PUSH(string & inp)
 {
-    pthread_mutex_lock(&(this->lock));
+    lock_guard<mutex> lock(_mutex);
     if( inp.size() > 1024)
     {
         throw(invalid_argument("ERROR: string is larger than 1025 bytes."));
@@ -41,15 +101,12 @@ void ex4::Stack::PUSH(string & inp)
     str_Node * node = new str_Node(inp);
     node-> setNext(this->head);
     this->head = node;
-    pthread_mutex_unlock(&(this->lock));
-
 }
 
 string ex4::Stack::TOP()
 {
-    pthread_mutex_lock(&(this->lock));
+    lock_guard<mutex> lock(_mutex);
     return this->get_head()->getData();
-    pthread_mutex_unlock(&(this->lock));
 }
 
 
