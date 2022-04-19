@@ -31,6 +31,7 @@ void *get_in_addr(struct sockaddr *sa)
 }
 
 int main(int argc, char *argv[])
+// argv[1] = "127.0.0.1"
 {
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
