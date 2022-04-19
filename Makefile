@@ -40,9 +40,11 @@ CFLAGS = -Wall -g -pthread $(SOURCE_PATH)
 # headers
 DEPS = heap_funcs.hpp dectest.h Stack.hpp Client.hpp Server.hpp
 
-# make target for Server
-
-# make target for Client
+Server: $(OBJECTS_SERVER) $(OBJECTS_STACK)
+	$(CC) $(CFLAGS) $^ -o $@
+	
+Client: $(OBJECTS_CLIENT)
+	$(CC) $(CFLAGS) $^ -o $@
 
 testServer : TestServer.o TestRunner.o
 	$(CC) $(CFLAGS) $^ -o $@ 

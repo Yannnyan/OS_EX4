@@ -1,7 +1,4 @@
-/*
-** client.c -- a stream socket client demo
-*/
-#include "Server.hpp"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -13,8 +10,11 @@
 #include <sys/socket.h>
 #include <iostream>
 #include <arpa/inet.h>
+#include <string>
 
 #include "Client.hpp"
+
+using namespace std;
 
 #define PORT "3490" // the port client will be connecting to 
 
@@ -29,6 +29,16 @@ void *get_in_addr(struct sockaddr *sa)
     }
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
+}
+
+string convertArrToString(char inp[BUFFERSIZE])
+{
+    string str;
+    for (int i=0; i< BUFFERSIZE; i++)
+    {
+        str.push_back(inp[i]);
+    }
+    return str;
 }
 
 int main(int argc, char *argv[])
