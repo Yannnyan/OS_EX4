@@ -43,6 +43,8 @@ string convertArrToString(char inp[BUFFERSIZE])
 
 int main(int argc, char *argv[])
 // argv[1] = "127.0.0.1"
+// argv[2...] = "<command> <options>"
+
 {
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
