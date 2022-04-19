@@ -2,7 +2,8 @@
 
 # Description
 ## What we've done
-In this excersice we implement a multi threaded thread safe. Also some standard functions as to manage the heap memory: stack, malloc (calloc) function, free function.  
+In this excersice we implement a multi threaded and thread safe stack. 
+</br> Also some standard functions as to manage the heap memory: stack, malloc (calloc) function, free function.  
 </br> In addition we've implemented a client server model, such that the server the stack we've implemented as an object.
 ## How the Server works
  The server listens to connections from multiple clients and opens a new connection and a new thread for each client and recvs information from the socket file descriptor associated with the client, untill the client closes connection. 
