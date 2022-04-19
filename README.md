@@ -33,7 +33,7 @@ General syntax:  ```make <target> ```</br>
 <ins>Compilation requirement:</ins> first compile with ```make Client``` && ``` make Server.```</br>
 <ins>Enviroment:</ins> Open one process for the **Server**, (preferably on the terminal), and another process or more :smile: for the **Client** (preferably on the terminal). 
 </br>
-<ins>Syntax for the Client main function arguments:</ins>  ``` argv[0] = "Client", argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
+<ins>Syntax for the Client main function arguments:</ins>  ``` argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
 </br> <ins>Syntax for the available Client commands:</ins> 
 </br> **Description**: the Client supposed to enter commands to alter the stack inside the server.</br>```"PUSH <some string>" ``` - pushes some string into the stack, 
 </br> ``` "POP" ``` - pops the first string out of the stack, 
