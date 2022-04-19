@@ -1,7 +1,7 @@
 /*
 ** client.c -- a stream socket client demo
 */
-
+#include "Server.hpp"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -12,8 +12,9 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <iostream>
-
 #include <arpa/inet.h>
+
+#include "Client.hpp"
 
 #define PORT "3490" // the port client will be connecting to 
 
@@ -39,7 +40,7 @@ int main(int argc, char *argv[])
     int rv;
     char s[INET6_ADDRSTRLEN];
 
-    if (argc != 2) {
+    if (argc < 2) {
         fprintf(stderr,"usage: client hostname\n");
         exit(1);
     }
@@ -83,10 +84,11 @@ int main(int argc, char *argv[])
 
     std::string temp;
     char str[BUFFERSIZE];
-    while (1)
+    int arg_c=2;
+    while (arg_c>argc)
     {
         memset(str, 0, BUFFERSIZE);
-        std::cin >> temp;
+        temp=convertArrToString(argv[arg_c]);
         if (temp.size() > BUFFERSIZE)
         {
             fprintf(stdout, "ERROR: cant send more than %d",BUFFERSIZE);
@@ -103,7 +105,7 @@ int main(int argc, char *argv[])
         }
         buf[numbytes] = '\0';
         printf("client: received '%s'\n",buf);
-
+        arg_c++;
     }
 
     

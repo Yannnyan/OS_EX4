@@ -3,7 +3,7 @@
 #include "Stack.hpp"
 #include <mutex>
 
-std::mutex _mutex;
+std::mutex _mutex1;
 
 using namespace ex4;
 using namespace std;
@@ -38,13 +38,13 @@ ex4::str_Node::str_Node(const string & str)
 // get the next node.
 str_Node * ex4::str_Node::getNext()
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     return this->next;
 }
 // set the next node.
 void ex4::str_Node::setNext(string & next)
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     if (this -> next != NULL)
     {
         
@@ -56,7 +56,7 @@ void ex4::str_Node::setNext(string & next)
 }
 void ex4::str_Node::setNext(str_Node * next)
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     if (this -> next != NULL)
     {
         
@@ -69,13 +69,13 @@ void ex4::str_Node::setNext(str_Node * next)
 // get the data of the node
 string & ex4::str_Node::getData()
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     return this->data;
 }
 // set the data of the node
 void ex4::str_Node::setData(string data)
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     this -> data = data;
 }
 
@@ -84,7 +84,7 @@ void ex4::str_Node::setData(string data)
 
 string ex4::Stack::POP()
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     str_Node * h = this->head;
     this->head = h->getNext();
     string str = h->getData();
@@ -93,7 +93,7 @@ string ex4::Stack::POP()
 }
 void ex4::Stack::PUSH(string & inp)
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     if( inp.size() > 1024)
     {
         throw(invalid_argument("ERROR: string is larger than 1025 bytes."));
@@ -105,7 +105,7 @@ void ex4::Stack::PUSH(string & inp)
 
 string ex4::Stack::TOP()
 {
-    lock_guard<mutex> lock(_mutex);
+    lock_guard<mutex> lock(_mutex1);
     return this->get_head()->getData();
 }
 

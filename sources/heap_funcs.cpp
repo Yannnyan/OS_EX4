@@ -6,7 +6,7 @@
 #include "heap_funcs.hpp"
 #include <string.h>
 
-std::mutex _mutex;
+std::mutex _mutex1;
 
 // typedef struct block
 // {
@@ -24,7 +24,7 @@ block * head = NULL;
 void * _malloc(size_t size)
 {   
     // call to constructor with the object of mutex created, which lets it loose after return statement
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex1);
     // malloc with size 0 returns NULL
     if (size == 0)
     {
@@ -66,7 +66,7 @@ void * _malloc(size_t size)
 void _free(void * ptr)
 {
     // call to constructor with the object of mutex created, which lets it loose after return statement
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex1);
     // trying to free null pointer
     if (ptr == NULL)
     {
@@ -107,7 +107,7 @@ void _free(void * ptr)
 void * _calloc(size_t member_num, size_t member_size)
 {
     // ensure thread safety for the call for calloc
-    std::lock_guard<std::mutex> lock(_mutex);
+    std::lock_guard<std::mutex> lock(_mutex1);
     size_t size = member_num * member_size;
     void * addr = _malloc(size);
     if (addr == NULL)
