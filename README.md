@@ -35,7 +35,7 @@ General syntax:  ```make <target> ```</br>
 </br>
 <ins>Syntax for the Client main function arguments:</ins>  ``` argv[0] = "Client", argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
 </br> <ins>Syntax for the available Client commands:</ins> 
-</br> **Description**: the Client supposed to enter commands to alter the stack inside the server.</br>```PUSH <some string> ``` - pushed some string into the stack, 
+</br> **Description**: the Client supposed to enter commands to alter the stack inside the server.</br>```"PUSH <some string>" ``` - pushes some string into the stack, 
 </br> ``` "POP" ``` - pops the first string out of the stack, 
 </br> ``` "TOP" ``` - peeks at the first string of the stack.
 
