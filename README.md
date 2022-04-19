@@ -8,14 +8,15 @@ In this excersice we implement a multi threaded and thread safe stack.
 ## How the Server works
  The server listens to connections from multiple clients and opens a new connection and a new thread for each client and recvs information from the socket file descriptor associated with the client, untill the client closes connection. 
  </br> Then each thread handles calls from the client. 
- </br> The server receives instructions to ```POP```, ```PUSH``` and ```TOP``` at the Stack. 
+ </br> The server receives instructions to ```"POP"```, ```"PUSH"``` and ```"TOP"``` from the Stack. 
  </br> The main purpose of the project is to make the stack thread safe such that the instructions and information is handled as expected. 
 ## How the client works
 The client's main function receives as arguments the instructions to pass to the server, and passes it one by one. 
 </br> Once the client finishes all the instructions, the client ends the connection to the server and the Server's thread dies afterwards.
 # Notes
-The first argument for the binary file of Client should be the local address : ``` 127.0.0.1 ```
-</br> all other arguments for the client except for 0  and arg 1 should be the instructions for the stack. such as ```PUSH hello world ```, or ```POP```, or ```TOP``` .
+The first argument for the binary file of Client should be the local address : ``` 127.0.0.1 ``` </br>
+The instruction ```"PUSH  some string"``` must be surrounded by double quote marks when passed the server as terminal argument, because the terminal delimeters arguments by white space characters. The purpose is to make the instruction and the parameter the same argument passed to the server, else this instruction wouldn't work.
+</br> all other arguments for the client except for 0  and arg 1 should be the instructions for the stack. such as ```"PUSH hello world" ```, or ```"POP"```, or ```"TOP"``` .
 
 # How to run
 First open terminal and change directory into **OS_EX4** wherever it is located at.</br>
@@ -35,8 +36,8 @@ General syntax:  ```make <target> ```</br>
 <ins>Syntax for the Client main function arguments:</ins>  ``` argv[0] = "Client", argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
 </br> <ins>Syntax for the available Client commands:</ins> 
 </br> **Description**: the Client supposed to enter commands to alter the stack inside the server.</br>```PUSH <some string> ``` - pushed some string into the stack, 
-</br> ``` POP ``` - pops the first string out of the stack, 
-</br> ``` TOP ``` - peeks at the first string of the stack.
+</br> ``` "POP" ``` - pops the first string out of the stack, 
+</br> ``` "TOP" ``` - peeks at the first string of the stack.
 
 # Visual
 

@@ -59,46 +59,181 @@ string convertArrToString(char inp[BUFFERSIZE])
     }
     return str;
 }
+char * extract_value(char * str)
+{
+    // define an char array with 1024 bytes
+    char * value = (char *) calloc(BUFFERSIZE , sizeof(char));
+    // define indexes
+    size_t i =0;
+    size_t index_value = 0;
+    size_t len = strlen(str);
+    // loop untill you find special character
+    while(i < len && str[i] != '\n' && str[i] != '\0' && str[i] != ' ')
+    {
+        i ++;
+    }
+    // if we found enter or null terminator, then it means that the user didn't put any value after the instruction or the instruction is wrong
+    if (str[i] == '\n' || str[i] == '\0')
+    {
+        return NULL;
+    }
+    // skip the space
+    i++;
+    // loop untill we reached the end of the value
+    while(i< len && str[i] != '\n' && str[i] != '\0' && str[i])
+    {
+        value[index_value++] = str[i];
+    }
+    // add null terminator to the string
+    value[index_value] = '\0';
+    return value;
+}
+char * extract_instruction(char * str)
+{
+    // instruction must be at least 3 bytes before the null terminator
+    if (strlen(str) < 3)
+    {
+        return (char *)"ERROR: illigal instruction";
+    }
+    // define instruction with 5 bytes
+    char  *instruction = (char *) calloc(5, sizeof(char));
+    size_t index = 0;
+    // loop untill we found the first special character
+    while (str[index] != ' ' && str[index] != '\0' && str[index] != '\n')
+    {
+        // if the instruction is longer than 5 it's not a ligal instruction 
+        if (index >= 5)
+        {
+            return (char *)"ERROR: illigal instruction";
+        }
+        instruction[index] = str[index];
+        index++;
+    }
+    // null terminator
+    instruction[index] = '\0';
+    return instruction;
+}
 
-void handleCall(char inp[BUFFERSIZE])
+bool startsWith(char * target, char * prefix)
+{
+    // if the prefix is longer than the target then return false
+    if (strlen(prefix) > strlen(target))
+    {
+        return false;
+    }
+    size_t len = strlen(prefix);
+    // loop through the first characters untill we reached the length of the prefix and if one character is not equal return false
+    for(size_t i=0; i< len; i++)
+    {
+        if (target[i] != prefix[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+void handleCall(int client_sockfd, char inp[BUFFERSIZE])
 {
     string str = convertArrToString(inp);
-    cout << inp << endl;
-    if (str.at(0) == 'p')
+    cout << str << endl;
+    char send_buffer[BUFFERSIZE] = "Instruction: ";
+    memset(send_buffer, 0, BUFFERSIZE);
+    char * instruction = extract_instruction(inp);
+    int r = 0;
+    // we want to send a buffer to the client, that says the instruction with the value afterwards,
+    // we need to determine how much bytes to add into send_buffer
+    size_t new_buf_size = strlen(inp) + strlen(send_buffer);
+    // if the new buf size bigger than buffersize than set to the new buffer to display some of the old buffer with the "Instruction" prefix
+    size_t n = new_buf_size >= BUFFERSIZE ? BUFFERSIZE - strlen(send_buffer) - 1 : new_buf_size;
+    if (startsWith(instruction, (char *)"PUSH"))
     {
+        free(instruction);
         stack.PUSH(str);
-        cout << "pushed into stack" << endl;
+        cout << inp << endl;
+        strncat(send_buffer, inp, n);
     }
-    else if (str.at(0) == 't')
+    else if (startsWith(instruction,  (char *)"TOP"))
     {
-        cout << stack.TOP() << endl;
+        free(instruction);
+        string ret = stack.TOP();
+        // print the returned value
+        cout << ret << endl;
+        char arr[BUFFERSIZE];
+        // cast the top string to an array
+        strcpy(arr, ret.c_str());
+        new_buf_size = strlen(arr) + strlen(send_buffer);
+        if (new_buf_size >= BUFFERSIZE)
+        {
+            if( (r = send(client_sockfd, arr, BUFFERSIZE, 0)) == 0 || r == -1)
+            {
+                perror("ERROR: recvd 0 or -1 from send ");
+                exit(1);
+            }
+            return;
+        }
+        strncat(send_buffer, arr, strlen(arr));
+    }   
+    else if (startsWith(instruction,  (char *)"POP"))
+    {
+        free(instruction);
+        string ret = stack.POP();
+        // print the returned value
+        cout << ret << endl;
+        char arr[BUFFERSIZE];
+        // cast the top string to an array
+        strcpy(arr, ret.c_str());
+        new_buf_size = strlen(arr) + strlen(send_buffer);
+        if (new_buf_size >= BUFFERSIZE)
+        {
+            if( (r = send(client_sockfd, arr, BUFFERSIZE + 1, 0)) == 0 || r == -1)
+            {
+                perror("ERROR: recvd 0 or -1 from send ");
+                exit(1);
+            }
+            return;
+        }
+        strncat(send_buffer, arr, strlen(arr));
     }
-    else if (str.at(0) == 'P')
+    else if (startsWith(instruction, (char *)"ERROR"))
     {
-        cout << stack.POP() << endl;
+        if ((r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0 || r == -1)
+        {
+            perror("ERROR: recved 0 or -1 from send ");
+            exit(1);
+        }
+    }
+    else{
+        if (instruction != NULL)
+        {
+            free(instruction);
+        }
+       
+    }
+    // send the value stored in send_buffer
+    if ( (r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0  || r == -1 )
+    {
+        perror("ERROR: recved 0 or -1 from send ");
+        exit(1);
     }
 }
 
 void * thread_func(void * args)
 {
     int new_sockfd = *(int*) args;
-    char buffer[BUFFERSIZE];
-    memset(buffer, 0, BUFFERSIZE);
+    char recv_buffer[BUFFERSIZE];
+    
+    memset(recv_buffer, 0, BUFFERSIZE);
     int r = 0;
     while(1)
     {
-        if ((r = recv(new_sockfd, buffer , BUFFERSIZE, 0)) == 0  || r == -1)
+        if ((r = recv(new_sockfd, recv_buffer , BUFFERSIZE, 0)) == 0  || r == -1)
         {
             perror("ERROR: recved 0 or -1 from recv");
             exit(1);
         }
-        handleCall(buffer);
-        if ( (r = send(new_sockfd, buffer, BUFFERSIZE, 0)) == 0  || r == -1 )
-        {
-            perror("ERROR: recved 0 or -1 from send ");
-            exit(1);
-        }
-        memset(buffer, 0, BUFFERSIZE);
+        handleCall(new_sockfd, recv_buffer);
+        memset(recv_buffer, 0, BUFFERSIZE);
     }
     
     close(new_sockfd);
