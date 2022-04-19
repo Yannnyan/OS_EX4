@@ -79,9 +79,6 @@ void ex4::str_Node::setData(string data)
     this -> data = data;
 }
 
-
-
-
 string ex4::Stack::POP()
 {
     lock_guard<mutex> lock(_mutex1);

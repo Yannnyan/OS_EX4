@@ -1,6 +1,4 @@
 #include "doctest.h"
-#include "heap_funcs.hpp"
-#include "Server.hpp"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>

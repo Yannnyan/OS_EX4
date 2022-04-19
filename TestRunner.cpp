@@ -11,8 +11,6 @@ struct ReporterGrader: public ConsoleReporter {
 
     void test_run_end(const TestRunStats& run_stats) override {
         ConsoleReporter::test_run_end(run_stats);
-        int numAsserts = run_stats.numAsserts >=  MIN_TESTS? run_stats.numAsserts:  MIN_TESTS;
-        float grade = (run_stats.numAsserts - run_stats.numAssertsFailed) * 100 / numAsserts;
         // std::cout << "Grade: " << grade << std::endl;
     }
 };

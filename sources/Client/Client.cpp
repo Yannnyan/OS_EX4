@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     std::string temp;
     char str[BUFFERSIZE];
     int arg_c=2;
-    while (arg_c>argc)
+    while (arg_c < argc)
     {
         memset(str, 0, BUFFERSIZE);
         temp=convertArrToString(argv[arg_c]);
