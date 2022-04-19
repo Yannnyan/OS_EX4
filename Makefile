@@ -42,7 +42,7 @@ DEPS = heap_funcs.hpp dectest.h Stack.hpp Client.hpp Server.hpp
 
 Server: $(OBJECTS_SERVER) $(OBJECTS_STACK)
 	$(CC) $(CFLAGS) $^ -o $@
-	
+
 Client: $(OBJECTS_CLIENT)
 	$(CC) $(CFLAGS) $^ -o $@
 
@@ -72,6 +72,6 @@ $(OBJECTS_CLIENT): $(SOURCES_CLIENT) $(HEADERS_CLIENT)
 .PHONY: clean
 
 clean: 
-	rm -f $(OBJECTS_CLIENT) $(OBJECTS_HEAP) $(OBJECTS_SERVER) $(OBJECTS_STACK) myServer Client myServer main testHeap testServer testClient *.o
+	rm -f $(OBJECTS_CLIENT) $(OBJECTS_HEAP) $(OBJECTS_SERVER) $(OBJECTS_STACK) Server Client testHeap testServer testClient *.o
 
 
