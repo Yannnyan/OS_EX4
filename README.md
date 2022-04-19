@@ -29,7 +29,7 @@ General syntax:  ```make <target> ```</br>
 
 ## User interface
 <ins>Compilation requirement:</ins> first compile with ```make Client``` && ``` make Server.```</br>
-<ins>Enviroment:</ins> Open one process for the **Server**, (preferably on the terminal), and another process for the **Client** (preferably on the terminal). 
+<ins>Enviroment:</ins> Open one process for the **Server**, (preferably on the terminal), and another process or more :) for the **Client** (preferably on the terminal). 
 </br>
 <ins>Syntax for the Client main function arguments:</ins>  ``` argv[0] = "Client", argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
 </br> <ins>Syntax for the available Client commands:</ins> 
