@@ -24,7 +24,8 @@ First open terminal and change directory into **OS_EX4** wherever it is located 
 ## Compilation:
 Makefile targets: </br> 
 General syntax:  ```make <target> ```</br>
-``` Server ``` - To compile the Server to a binary,
+``` all ``` - To compile both the server to a binary and the client to a binary.
+</br>``` Server ``` - To compile the Server to a binary,
 </br>  ```Client``` - To compile the Client to a binary (the Client is the user interface),
 </br>  ```testServer``` - To compile the Server test,
 </br>  ```testHeap``` - To compile the tests for the malloc calloc and free functions, </br> ```testClient``` - to compile the Client tests,
