@@ -55,6 +55,9 @@ testClient : TestRunner.o TestClient.o
 testHeap : TestRunner.o TestHeap.o $(OBJECTS_HEAP)
 	$(CC) $(CFLAGS) $^ -o $@ 
 
+testStack : TestRunner.o TestStack.o $(OBJECTS_STACK)
+	$(CC) $(CFLAGS) $^ -o $@
+
 %.o: %.cpp $(HEADERS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
@@ -72,6 +75,6 @@ $(OBJECTS_CLIENT): $(SOURCES_CLIENT) $(HEADERS_CLIENT)
 .PHONY: clean
 
 clean: 
-	rm -f $(OBJECTS_CLIENT) $(OBJECTS_HEAP) $(OBJECTS_SERVER) $(OBJECTS_STACK) Server Client testHeap testServer testClient *.o
+	rm -f $(OBJECTS_CLIENT) $(OBJECTS_HEAP) $(OBJECTS_SERVER) $(OBJECTS_STACK) Server Client testStack testHeap testServer testClient *.o
 
 

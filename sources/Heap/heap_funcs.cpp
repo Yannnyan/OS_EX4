@@ -6,7 +6,7 @@
 #include "heap_funcs.hpp"
 #include <string.h>
 
-std::mutex _mutex1;
+pthread_mutex_t lock2 = PTHREAD_MUTEX_INITIALIZER;
 
 // typedef struct block
 // {
@@ -19,12 +19,32 @@ block * head = NULL;
 
 #define BLOCK_SIZE sizeof(struct block)
 
+// adding thread safety:
+void * _malloc(size_t size)
+{
+    pthread_mutex_lock(&lock2);
+    void * ret = _malloc1(size);
+    pthread_mutex_unlock(&lock2);
+    return ret;
+}
+void * _calloc(size_t member_num, size_t member_size)
+{
+    pthread_mutex_lock(&lock2);
+    void * ret = _calloc1(member_num, member_size);
+    pthread_mutex_unlock(&lock2);
+    return ret;
+}
+void _free(void * ptr)
+{
+    pthread_mutex_lock(&lock2);
+    _free1(ptr);
+    pthread_mutex_unlock(&lock2);
+}
+
 // allocate size bytes in the heap, if function is successfull, returns address of the allocated mem
 // return NULL if the function fails or if size to alocate is 0
-void * _malloc(size_t size)
+void * _malloc1(size_t size)
 {   
-    // call to constructor with the object of mutex created, which lets it loose after return statement
-    std::lock_guard<std::mutex> lock(_mutex1);
     // malloc with size 0 returns NULL
     if (size == 0)
     {
@@ -63,13 +83,12 @@ void * _malloc(size_t size)
 
 
 // receiving the address the user wants to free
-void _free(void * ptr)
+void _free1(void * ptr)
 {
-    // call to constructor with the object of mutex created, which lets it loose after return statement
-    std::lock_guard<std::mutex> lock(_mutex1);
     // trying to free null pointer
     if (ptr == NULL)
     {
+        pthread_mutex_unlock(&lock2);
         throw(std::invalid_argument("null pointer cannot be freed."));
     }
     
@@ -91,11 +110,13 @@ void _free(void * ptr)
     }
     if (found == 0)
     {
+        pthread_mutex_unlock(&lock2);
         throw(std::invalid_argument("cannot free block that is not pointing to address on the heap."));
     }
     // if this block is already free then throw an exception
     if ((block_address->free) == 1)
     {
+        pthread_mutex_unlock(&lock2);
         throw(std::invalid_argument("free already freed block."));
     }
     // else set the block to be freed
@@ -104,10 +125,8 @@ void _free(void * ptr)
 
 
 
-void * _calloc(size_t member_num, size_t member_size)
+void * _calloc1(size_t member_num, size_t member_size)
 {
-    // ensure thread safety for the call for calloc
-    std::lock_guard<std::mutex> lock(_mutex1);
     size_t size = member_num * member_size;
     void * addr = _malloc(size);
     if (addr == NULL)

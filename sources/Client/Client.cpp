@@ -96,28 +96,26 @@ int main(int argc, char *argv[])
 
     std::string temp;
     char str[BUFFERSIZE];
-    int arg_c=2;
-    while (arg_c < argc)
+    for (int arg_c = 2; arg_c < argc; arg_c++)
     {
         memset(str, 0, BUFFERSIZE);
-        temp=convertArrToString(argv[arg_c]);
-        if (temp.size() > BUFFERSIZE)
+        printf("[Client] Sending %s to server. . .\n", argv[arg_c]);
+        if (strlen(argv[arg_c]) > BUFFERSIZE)
         {
-            fprintf(stdout, "ERROR: cant send more than %d",BUFFERSIZE);
+            fprintf(stdout, "ERROR: cant send more than %d\n",BUFFERSIZE);
             continue;
         }
-        if ((numbytes = send(sockfd, str, BUFFERSIZE, 0)) == 0 || numbytes == -1)
+        if ((numbytes = send(sockfd, argv[arg_c], BUFFERSIZE, 0)) == 0 || numbytes == -1)
         {
             perror("send");
             exit(1);
         }
-        if ((numbytes = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
+        if ((numbytes = recv(sockfd, str, BUFFERSIZE-1, 0)) == -1) {
             perror("recv");
             exit(1);
         }
-        buf[numbytes] = '\0';
+        str[numbytes] = '\0';
         printf("client: received '%s'\n",buf);
-        arg_c++;
     }
 
     

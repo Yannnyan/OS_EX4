@@ -14,6 +14,11 @@ namespace ex4
         private:
             string data;
             str_Node * next;
+            // functions
+            str_Node * getNext1()
+            {
+                return this->next;
+            }
             
         public:
             // construct an empty node and set the next to null
@@ -39,7 +44,9 @@ namespace ex4
         private:
             str_Node * head;
             size_t size;
-            pthread_mutex_t lock;
+
+            string TOP1();
+            string POP1();
 
         public:
             // constructor initializes stack size to 10

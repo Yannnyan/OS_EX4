@@ -136,42 +136,26 @@ bool startsWith(char * target, char * prefix)
 void handleCall(int client_sockfd, char inp[BUFFERSIZE])
 {
     string str = convertArrToString(inp);
-    cout << str << endl;
     char send_buffer[BUFFERSIZE] = "Instruction: ";
     memset(send_buffer, 0, BUFFERSIZE);
     char * instruction = extract_instruction(inp);
+    puts(instruction);
     int r = 0;
-    // we want to send a buffer to the client, that says the instruction with the value afterwards,
-    // we need to determine how much bytes to add into send_buffer
-    size_t new_buf_size = strlen(inp) + strlen(send_buffer);
-    // if the new buf size bigger than buffersize than set to the new buffer to display some of the old buffer with the "Instruction" prefix
-    size_t n = new_buf_size >= BUFFERSIZE ? BUFFERSIZE - strlen(send_buffer) - 1 : new_buf_size;
     if (startsWith(instruction, (char *)"PUSH"))
     {
         free(instruction);
         stack.PUSH(str);
-        cout << inp << endl;
-        strncat(send_buffer, inp, n);
+        char * temp = (char *)"PUSH";
+        strncat(send_buffer,temp, strlen(temp));
     }
     else if (startsWith(instruction,  (char *)"TOP"))
     {
         free(instruction);
         string ret = stack.TOP();
         // print the returned value
-        cout << ret << endl;
         char arr[BUFFERSIZE];
         // cast the top string to an array
         strcpy(arr, ret.c_str());
-        new_buf_size = strlen(arr) + strlen(send_buffer);
-        if (new_buf_size >= BUFFERSIZE)
-        {
-            if( (r = send(client_sockfd, arr, BUFFERSIZE, 0)) == 0 || r == -1)
-            {
-                perror("ERROR: recvd 0 or -1 from send ");
-                exit(1);
-            }
-            return;
-        }
         strncat(send_buffer, arr, strlen(arr));
     }   
     else if (startsWith(instruction,  (char *)"POP"))
@@ -179,20 +163,9 @@ void handleCall(int client_sockfd, char inp[BUFFERSIZE])
         free(instruction);
         string ret = stack.POP();
         // print the returned value
-        cout << ret << endl;
         char arr[BUFFERSIZE];
         // cast the top string to an array
         strcpy(arr, ret.c_str());
-        new_buf_size = strlen(arr) + strlen(send_buffer);
-        if (new_buf_size >= BUFFERSIZE)
-        {
-            if( (r = send(client_sockfd, arr, BUFFERSIZE + 1, 0)) == 0 || r == -1)
-            {
-                perror("ERROR: recvd 0 or -1 from send ");
-                exit(1);
-            }
-            return;
-        }
         strncat(send_buffer, arr, strlen(arr));
     }
     else if (startsWith(instruction, (char *)"ERROR"))
@@ -200,7 +173,7 @@ void handleCall(int client_sockfd, char inp[BUFFERSIZE])
         if ((r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0 || r == -1)
         {
             perror("ERROR: recved 0 or -1 from send ");
-            exit(1);
+            pthread_exit(NULL);
         }
     }
     else{
@@ -214,7 +187,7 @@ void handleCall(int client_sockfd, char inp[BUFFERSIZE])
     if ( (r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0  || r == -1 )
     {
         perror("ERROR: recved 0 or -1 from send ");
-        exit(1);
+        pthread_exit(NULL);
     }
 }
 
@@ -230,8 +203,9 @@ void * thread_func(void * args)
         if ((r = recv(new_sockfd, recv_buffer , BUFFERSIZE, 0)) == 0  || r == -1)
         {
             perror("ERROR: recved 0 or -1 from recv");
-            exit(1);
+            break;
         }
+        puts(recv_buffer);
         handleCall(new_sockfd, recv_buffer);
         memset(recv_buffer, 0, BUFFERSIZE);
     }
@@ -313,7 +287,7 @@ int main(void)
         exit(1);
     }
 
-    printf("server: waiting for connections...\n");
+    printf("[Server] Waiting for connections...\n");
 
     while(1) {  // main accept() loop
         sin_size = sizeof their_addr;
@@ -325,8 +299,8 @@ int main(void)
 
         inet_ntop(their_addr.ss_family,
             get_in_addr((struct sockaddr *)&their_addr),
-            s, sizeof s);
-        printf("server: got connection from %s\n", s);
+            s, sizeof(s));
+        printf("[server] Got connection from %s\n", s);
         pthread_create(&buffer_thread, NULL, &thread_func, &new_fd);
     }
 
