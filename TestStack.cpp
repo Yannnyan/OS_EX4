@@ -71,7 +71,12 @@ TEST_CASE("Good input")
     CHECK(stack_contains(arr, 4, inpT2_2));
 }
 
-
+TEST_CASE("TOP")
+{
+    string str = "hello world";
+    stack.PUSH(str);
+    cout << stack.TOP() << endl;
+}
 
 
 

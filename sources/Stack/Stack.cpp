@@ -95,7 +95,7 @@ string ex4::Stack::POP()
     this->size -=1;
     return str;
 }
-void ex4::Stack::PUSH(string & inp)
+void ex4::Stack::PUSH(string inp)
 {
     pthread_mutex_lock(&lock1);
     if( inp.size() > 1024)

@@ -49,20 +49,10 @@ void *get_in_addr(struct sockaddr *sa)
 
     return &(((struct sockaddr_in6*)sa)->sin6_addr);
 }
-
-string convertArrToString(char inp[BUFFERSIZE])
-{
-    string str;
-    for (int i=0; i< BUFFERSIZE; i++)
-    {
-        str.push_back(inp[i]);
-    }
-    return str;
-}
 char * extract_value(char * str)
 {
     // define an char array with 1024 bytes
-    char * value = (char *) calloc(BUFFERSIZE , sizeof(char));
+    char * value = (char *) calloc(strlen(str) + 1 , sizeof(char));
     // define indexes
     size_t i =0;
     size_t index_value = 0;
@@ -72,48 +62,35 @@ char * extract_value(char * str)
     {
         i ++;
     }
-    // if we found enter or null terminator, then it means that the user didn't put any value after the instruction or the instruction is wrong
-    if (str[i] == '\n' || str[i] == '\0')
-    {
-        return NULL;
-    }
-    // skip the space
     i++;
     // loop untill we reached the end of the value
-    while(i< len && str[i] != '\n' && str[i] != '\0' && str[i])
+    while(i< len && str[i] != '\n' && str[i] != '\0')
     {
-        value[index_value++] = str[i];
+        value[index_value++] = str[i++];
     }
     // add null terminator to the string
     value[index_value] = '\0';
     return value;
 }
-char * extract_instruction(char * str)
+char * convert_string_to_array(string & str)
 {
-    // instruction must be at least 3 bytes before the null terminator
-    if (strlen(str) < 3)
+    char * arr = (char *)calloc(BUFFERSIZE, sizeof(char));
+    for(size_t i=0; i< str.size(); i++)
     {
-        return (char *)"ERROR: illigal instruction";
+        arr[i] = str.at(i);
     }
-    // define instruction with 5 bytes
-    char  *instruction = (char *) calloc(5, sizeof(char));
-    size_t index = 0;
-    // loop untill we found the first special character
-    while (str[index] != ' ' && str[index] != '\0' && str[index] != '\n')
-    {
-        // if the instruction is longer than 5 it's not a ligal instruction 
-        if (index >= 5)
-        {
-            return (char *)"ERROR: illigal instruction";
-        }
-        instruction[index] = str[index];
-        index++;
-    }
-    // null terminator
-    instruction[index] = '\0';
-    return instruction;
+    arr[str.size()] = '\0';
+    return arr;
 }
-
+string convertArrToString(char inp[BUFFERSIZE])
+{
+    string str;
+    for (size_t i=0; i< strlen(inp); i++)
+    {
+        str.push_back(inp[i]);
+    }
+    return str;
+}
 bool startsWith(char * target, char * prefix)
 {
     // if the prefix is longer than the target then return false
@@ -135,59 +112,33 @@ bool startsWith(char * target, char * prefix)
 
 void handleCall(int client_sockfd, char inp[BUFFERSIZE])
 {
-    string str = convertArrToString(inp);
-    char send_buffer[BUFFERSIZE] = "Instruction: ";
-    memset(send_buffer, 0, BUFFERSIZE);
-    char * instruction = extract_instruction(inp);
-    puts(instruction);
-    int r = 0;
-    if (startsWith(instruction, (char *)"PUSH"))
+    char * sendBuffer;
+    if (startsWith(inp, (char *)"TOP"))
     {
-        free(instruction);
+        string str = stack.TOP();
+        sendBuffer = convert_string_to_array(str);
+        send(client_sockfd,sendBuffer ,strlen(sendBuffer) + 1, 0);
+        free(sendBuffer);
+    }
+    else if (startsWith(inp,(char *)"POP"))
+    {
+        string str = stack.POP();
+        sendBuffer = convert_string_to_array(str);
+        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
+        free(sendBuffer);
+    }
+    else if (startsWith(inp, (char *)"PUSH"))
+    {
+        sendBuffer = (char *)"Pushed into stack";
+        char * value = extract_value(inp);
+        string str = convertArrToString(value);
         stack.PUSH(str);
-        char * temp = (char *)"PUSH";
-        strncat(send_buffer,temp, strlen(temp));
-    }
-    else if (startsWith(instruction,  (char *)"TOP"))
-    {
-        free(instruction);
-        string ret = stack.TOP();
-        // print the returned value
-        char arr[BUFFERSIZE];
-        // cast the top string to an array
-        strcpy(arr, ret.c_str());
-        strncat(send_buffer, arr, strlen(arr));
-    }   
-    else if (startsWith(instruction,  (char *)"POP"))
-    {
-        free(instruction);
-        string ret = stack.POP();
-        // print the returned value
-        char arr[BUFFERSIZE];
-        // cast the top string to an array
-        strcpy(arr, ret.c_str());
-        strncat(send_buffer, arr, strlen(arr));
-    }
-    else if (startsWith(instruction, (char *)"ERROR"))
-    {
-        if ((r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0 || r == -1)
-        {
-            perror("ERROR: recved 0 or -1 from send ");
-            pthread_exit(NULL);
-        }
+        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
+        free(value);
     }
     else{
-        if (instruction != NULL)
-        {
-            free(instruction);
-        }
-       
-    }
-    // send the value stored in send_buffer
-    if ( (r = send(client_sockfd, send_buffer, BUFFERSIZE, 0)) == 0  || r == -1 )
-    {
-        perror("ERROR: recved 0 or -1 from send ");
-        pthread_exit(NULL);
+        sendBuffer = (char *)"ERROR: cannot interprate message";
+        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
     }
 }
 
@@ -205,7 +156,7 @@ void * thread_func(void * args)
             perror("ERROR: recved 0 or -1 from recv");
             break;
         }
-        puts(recv_buffer);
+        printf("[Server] Received msg from client.");
         handleCall(new_sockfd, recv_buffer);
         memset(recv_buffer, 0, BUFFERSIZE);
     }

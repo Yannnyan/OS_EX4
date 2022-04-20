@@ -54,7 +54,7 @@ namespace ex4
             // destructor, destroys the array
             ~Stack();
             // push text into the stack
-            void PUSH(string & text); 
+            void PUSH(string text); 
             // pop text from the stack
             string POP(); 
             // return the first string from the stack 

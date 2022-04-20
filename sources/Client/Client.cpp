@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
 
 {
     int sockfd, numbytes;  
-    char buf[MAXDATASIZE];
     struct addrinfo hints, *servinfo, *p;
     int rv;
     char s[INET6_ADDRSTRLEN];
@@ -95,27 +94,27 @@ int main(int argc, char *argv[])
     freeaddrinfo(servinfo); // all done with this structure
 
     std::string temp;
-    char str[BUFFERSIZE];
+    char buf[BUFFERSIZE];
     for (int arg_c = 2; arg_c < argc; arg_c++)
     {
-        memset(str, 0, BUFFERSIZE);
+        memset(buf, 0, BUFFERSIZE);
         printf("[Client] Sending %s to server. . .\n", argv[arg_c]);
         if (strlen(argv[arg_c]) > BUFFERSIZE)
         {
             fprintf(stdout, "ERROR: cant send more than %d\n",BUFFERSIZE);
             continue;
         }
-        if ((numbytes = send(sockfd, argv[arg_c], BUFFERSIZE, 0)) == 0 || numbytes == -1)
+        if ((numbytes = send(sockfd, argv[arg_c], strlen(argv[arg_c]) + 1, 0)) == 0 || numbytes == -1)
         {
             perror("send");
             exit(1);
         }
-        if ((numbytes = recv(sockfd, str, BUFFERSIZE-1, 0)) == -1) {
+        if ((numbytes = recv(sockfd, buf, BUFFERSIZE-1, 0)) == -1) {
             perror("recv");
             exit(1);
         }
-        str[numbytes] = '\0';
-        printf("client: received '%s'\n",buf);
+        buf[numbytes] = '\0';
+        fprintf(stdout, "[Client] Got message from Server: %s\n", buf);
     }
 
     
