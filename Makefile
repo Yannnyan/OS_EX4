@@ -40,6 +40,8 @@ CFLAGS = -Wall -g -pthread $(SOURCE_PATH)
 # headers
 DEPS = heap_funcs.hpp dectest.h Stack.hpp Client.hpp Server.hpp
 
+all: Server Client 
+
 Server: $(OBJECTS_SERVER) $(OBJECTS_STACK)
 	$(CC) $(CFLAGS) $^ -o $@
 
