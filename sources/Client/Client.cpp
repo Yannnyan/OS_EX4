@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     char s[INET6_ADDRSTRLEN];
 
     if (argc < 2) {
-        fprintf(stderr,"usage: client hostname\n");
+        fprintf(stderr,"PERROR: usage: client hostname\n");
         exit(1);
     }
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     hints.ai_socktype = SOCK_STREAM;
 
     if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        fprintf(stderr, "PERROR: getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
@@ -69,13 +69,13 @@ int main(int argc, char *argv[])
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("client: socket");
+            perror("PERROR: [Client] socket");
             continue;
         }
 
         if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("client: connect");
+            perror("PERROR: [Client] connect");
             continue;
         }
 
@@ -83,13 +83,13 @@ int main(int argc, char *argv[])
     }
 
     if (p == NULL) {
-        fprintf(stderr, "client: failed to connect\n");
+        fprintf(stderr, "PERROR: [Client] failed to connect\n");
         return 2;
     }
 
     inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
             s, sizeof s);
-    printf("client: connecting to %s\n", s);
+    printf("[Client] connecting to %s\n", s);
 
     freeaddrinfo(servinfo); // all done with this structure
 
@@ -101,20 +101,21 @@ int main(int argc, char *argv[])
         printf("[Client] Sending %s to server. . .\n", argv[arg_c]);
         if (strlen(argv[arg_c]) > BUFFERSIZE)
         {
-            fprintf(stdout, "ERROR: cant send more than %d\n",BUFFERSIZE);
+            fprintf(stdout, "PERROR: cant send more than %d\n",BUFFERSIZE);
             continue;
         }
         if ((numbytes = send(sockfd, argv[arg_c], strlen(argv[arg_c]) + 1, 0)) == 0 || numbytes == -1)
         {
-            perror("send");
+            perror("PERROR: send");
             exit(1);
         }
         if ((numbytes = recv(sockfd, buf, BUFFERSIZE-1, 0)) == -1) {
-            perror("recv");
+            perror("PERROR: recv");
             exit(1);
         }
         buf[numbytes] = '\0';
-        fprintf(stdout, "[Client] Got message from Server: %s\n", buf);
+        fprintf(stdout, "OUTPUT: %s\n", buf);
+
     }
 
     

@@ -110,21 +110,30 @@ bool startsWith(char * target, char * prefix)
     return true;
 }
 
+void send_message(int client_sockfd, char * buffer, size_t size_buffer, int flags)
+{
+    if (send(client_sockfd, buffer, size_buffer, flags) == -1)
+    {
+        perror("PERROR: send returned -1");
+    }
+}
+
 void handleCall(int client_sockfd, char inp[BUFFERSIZE])
 {
     char * sendBuffer;
     if (startsWith(inp, (char *)"TOP"))
     {
         string str = stack.TOP();
+        cout << "OUTPUT: " + str << endl;
         sendBuffer = convert_string_to_array(str);
-        send(client_sockfd,sendBuffer ,strlen(sendBuffer) + 1, 0);
+        send_message(client_sockfd,sendBuffer ,strlen(sendBuffer) + 1, 0);
         free(sendBuffer);
     }
     else if (startsWith(inp,(char *)"POP"))
     {
         string str = stack.POP();
         sendBuffer = convert_string_to_array(str);
-        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
+        send_message(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
         free(sendBuffer);
     }
     else if (startsWith(inp, (char *)"PUSH"))
@@ -133,12 +142,12 @@ void handleCall(int client_sockfd, char inp[BUFFERSIZE])
         char * value = extract_value(inp);
         string str = convertArrToString(value);
         stack.PUSH(str);
-        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
+        send_message(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
         free(value);
     }
     else{
         sendBuffer = (char *)"ERROR: cannot interprate message";
-        send(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
+        send_message(client_sockfd, sendBuffer, strlen(sendBuffer) + 1, 0);
     }
 }
 
@@ -153,10 +162,10 @@ void * thread_func(void * args)
     {
         if ((r = recv(new_sockfd, recv_buffer , BUFFERSIZE, 0)) == 0  || r == -1)
         {
-            perror("ERROR: recved 0 or -1 from recv");
+            perror("PERROR: recved 0 or -1 from recv\n");
             break;
         }
-        printf("[Server] Received msg from client.");
+        printf("[Server] Received msg from client.\n");
         handleCall(new_sockfd, recv_buffer);
         memset(recv_buffer, 0, BUFFERSIZE);
     }
@@ -191,7 +200,7 @@ int main(void)
     hints.ai_flags = AI_PASSIVE; // use my IP
 
     if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
+        fprintf(stderr, "PERROR: getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
@@ -199,19 +208,19 @@ int main(void)
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("server: socket");
+            perror("PERROR: [Server]  socket");
             continue;
         }
 
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
                 sizeof(int)) == -1) {
-            perror("setsockopt");
+            perror("PERROR: setsockopt");
             exit(1);
         }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("server: bind");
+            perror("PERROR: [Server]  bind");
             continue;
         }
 
@@ -221,12 +230,12 @@ int main(void)
     freeaddrinfo(servinfo); // all done with this structure
 
     if (p == NULL)  {
-        fprintf(stderr, "server: failed to bind\n");
+        fprintf(stderr, "PERROR: [Server] failed to bind\n");
         exit(1);
     }
 
     if (listen(sockfd, BACKLOG) == -1) {
-        perror("listen");
+        perror("PERROR: listen");
         exit(1);
     }
 
@@ -234,7 +243,7 @@ int main(void)
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("sigaction");
+        perror("PERROR: sigaction");
         exit(1);
     }
 
@@ -244,14 +253,14 @@ int main(void)
         sin_size = sizeof their_addr;
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
-            perror("accept");
+            perror("PERROR: accept");
             continue;
         }
 
         inet_ntop(their_addr.ss_family,
             get_in_addr((struct sockaddr *)&their_addr),
             s, sizeof(s));
-        printf("[server] Got connection from %s\n", s);
+        printf("[Server] Got connection from %s\n", s);
         pthread_create(&buffer_thread, NULL, &thread_func, &new_fd);
     }
 
