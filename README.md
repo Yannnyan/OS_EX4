@@ -42,7 +42,8 @@ General syntax:  ```make <target> ```</br>
 </br> ``` "TOP" ``` - peeks at the first string of the stack.
 
 # Visual
-![image](https://user-images.githubusercontent.com/82415308/164236313-1a78542a-c997-492b-bf93-c2fdd61969b4.png)
+![image](https://user-images.githubusercontent.com/82415308/164616403-84cb955f-e7c1-4a9e-8989-45f3284f56d0.png)
+
 
 ## for devs
 [malloc](https://man7.org/linux/man-pages/man3/free.3.html) [sbrk](https://man7.org/linux/man-pages/man2/sbrk.2.html)  </br> [free](https://man7.org/linux/man-pages/man3/free.3.html) [brk](https://man7.org/linux/man-pages/man2/sbrk.2.html) </br> [getrlimit](https://man7.org/linux/man-pages/man2/getrlimit.2.html) [setrlimit](https://man7.org/linux/man-pages/man2/getrlimit.2.html)
