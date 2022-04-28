@@ -15,9 +15,6 @@ The client's main function receives as arguments the instructions to pass to the
 </br> Once the client finishes all the instructions, the client ends the connection to the server and the Server's thread dies afterwards.
 # Notes
 The first argument for the binary file of Client should be the local address : ``` 127.0.0.1 ``` </br>
-The client must pass additional arguments (argv[n >= 2]) when excecuting the binary file, such as "PUSH some string" or "TOP" or "POP". </br>
-The instruction ```"PUSH  some string"``` must be surrounded by double quote marks when passed the server as terminal argument, because the terminal delimeters arguments by white space characters. The purpose is to make the instruction and the parameter the same argument passed to the server, else this instruction wouldn't work.
-</br> all other arguments for the client except for 0  and arg 1 should be the instructions for the stack. such as ```"PUSH hello world" ```, or ```"POP"```, or ```"TOP"``` .
 
 # How to run
 First open terminal and change directory into **OS_EX4** wherever it is located at.</br>
@@ -35,7 +32,7 @@ General syntax:  ```make <target> ```</br>
 <ins>Compilation requirement:</ins> first compile with ```make Client``` && ``` make Server.```</br>
 <ins>Enviroment:</ins> Open one process for the **Server**, (preferably on the terminal), and another process or more :smile: for the **Client** (preferably on the terminal). 
 </br>
-<ins>Syntax for the Client main function arguments:</ins>  ``` argv[1] = "127.0.0.1", argv[n >= 2] = "<command> <options>"``` . 
+<ins>Syntax for the Client main function arguments:</ins>  ``` argv[1] = "127.0.0.1"``` . 
 </br> <ins>Syntax for the available Client commands:</ins> 
 </br> **Description**: the Client supposed to enter commands to alter the stack inside the server.</br>```"PUSH <some string>" ``` - pushes some string into the stack, 
 </br> ``` "POP" ``` - pops the first string out of the stack, 
