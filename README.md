@@ -42,7 +42,8 @@ General syntax:  ```make <target> ```</br>
 </br> ``` "TOP" ``` - peeks at the first string of the stack.
 
 # Visual
-![image](https://user-images.githubusercontent.com/82415308/164616403-84cb955f-e7c1-4a9e-8989-45f3284f56d0.png)
+![image](https://user-images.githubusercontent.com/82415308/165709379-be935561-c95e-46c5-af67-f88e7edb8fe6.png)
+
 
 
 ## for devs
