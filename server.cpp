@@ -114,7 +114,7 @@ void send_message(int client_sockfd, char * buffer, size_t size_buffer, int flag
 {
     if (send(client_sockfd, buffer, size_buffer, flags) == -1)
     {
-        perror("PERROR: send returned -1");
+        perror("ERROR: send returned -1");
     }
 }
 
@@ -162,7 +162,7 @@ void * thread_func(void * args)
     {
         if ((r = recv(new_sockfd, recv_buffer , BUFFERSIZE, 0)) == 0  || r == -1)
         {
-            perror("PERROR: recved 0 or -1 from recv\n");
+            perror("ERROR: recved 0 or -1 from recv\n");
             break;
         }
         printf("[Server] Received msg from client.\n");
@@ -200,7 +200,7 @@ int main(void)
     hints.ai_flags = AI_PASSIVE; // use my IP
 
     if ((rv = getaddrinfo(NULL, PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "PERROR: getaddrinfo: %s\n", gai_strerror(rv));
+        fprintf(stderr, "ERROR: getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
@@ -208,19 +208,19 @@ int main(void)
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("PERROR: [Server]  socket");
+            perror("ERROR: [Server]  socket");
             continue;
         }
 
         if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes,
                 sizeof(int)) == -1) {
-            perror("PERROR: setsockopt");
+            perror("ERROR: setsockopt");
             exit(1);
         }
 
         if (bind(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("PERROR: [Server]  bind");
+            perror("ERROR: [Server]  bind");
             continue;
         }
 
@@ -230,12 +230,12 @@ int main(void)
     freeaddrinfo(servinfo); // all done with this structure
 
     if (p == NULL)  {
-        fprintf(stderr, "PERROR: [Server] failed to bind\n");
+        fprintf(stderr, "ERROR: [Server] failed to bind\n");
         exit(1);
     }
 
     if (listen(sockfd, BACKLOG) == -1) {
-        perror("PERROR: listen");
+        perror("ERROR: listen");
         exit(1);
     }
 
@@ -243,7 +243,7 @@ int main(void)
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = SA_RESTART;
     if (sigaction(SIGCHLD, &sa, NULL) == -1) {
-        perror("PERROR: sigaction");
+        perror("ERROR: sigaction");
         exit(1);
     }
 
@@ -253,7 +253,7 @@ int main(void)
         sin_size = sizeof their_addr;
         new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size);
         if (new_fd == -1) {
-            perror("PERROR: accept");
+            perror("ERROR: accept");
             continue;
         }
 

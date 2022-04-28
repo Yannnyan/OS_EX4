@@ -41,6 +41,26 @@ string convertArrToString(char inp[BUFFERSIZE])
     return str;
 }
 
+char * getString()
+{
+    char * str = (char *) malloc(BUFFERSIZE * sizeof(char));
+    int index = 0;
+    char c;
+    while((c = getc(stdin)) != EOF && c != 0 && c != '\n')
+    {
+        if (index >= BUFFERSIZE)
+        {
+            free(str);
+            fprintf(stdout, "ERROR: buffer too long.");
+            return NULL;
+        }
+        str[index++] = c;
+    }
+    
+    return str;
+}
+
+
 int main(int argc, char *argv[])
 // argv[1] = "127.0.0.1"
 // argv[2...] = "<command> <options>"
@@ -52,7 +72,7 @@ int main(int argc, char *argv[])
     char s[INET6_ADDRSTRLEN];
 
     if (argc < 2) {
-        fprintf(stderr,"PERROR: usage: client hostname\n");
+        fprintf(stderr,"ERROR: usage: client hostname\n");
         exit(1);
     }
 
@@ -61,7 +81,7 @@ int main(int argc, char *argv[])
     hints.ai_socktype = SOCK_STREAM;
 
     if ((rv = getaddrinfo(argv[1], PORT, &hints, &servinfo)) != 0) {
-        fprintf(stderr, "PERROR: getaddrinfo: %s\n", gai_strerror(rv));
+        fprintf(stderr, "ERROR: getaddrinfo: %s\n", gai_strerror(rv));
         return 1;
     }
 
@@ -69,13 +89,13 @@ int main(int argc, char *argv[])
     for(p = servinfo; p != NULL; p = p->ai_next) {
         if ((sockfd = socket(p->ai_family, p->ai_socktype,
                 p->ai_protocol)) == -1) {
-            perror("PERROR: [Client] socket");
+            perror("ERROR: [Client] socket");
             continue;
         }
 
         if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
             close(sockfd);
-            perror("PERROR: [Client] connect");
+            perror("ERROR: [Client] connect");
             continue;
         }
 
@@ -83,7 +103,7 @@ int main(int argc, char *argv[])
     }
 
     if (p == NULL) {
-        fprintf(stderr, "PERROR: [Client] failed to connect\n");
+        fprintf(stderr, "ERROR: [Client] failed to connect\n");
         return 2;
     }
 
@@ -93,35 +113,32 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servinfo); // all done with this structure
 
-    std::string temp;
     char buf[BUFFERSIZE];
-    for (int arg_c = 2; arg_c < argc; arg_c++)
+    char * temp;
+    while(1)
     {
+        temp = getString();
+        numbytes = strlen((char *)temp) + 1;
         memset(buf, 0, BUFFERSIZE);
-        printf("[Client] Sending %s to server. . .\n", argv[arg_c]);
-        if (strlen(argv[arg_c]) > BUFFERSIZE)
+        if (temp == NULL)
         {
-            fprintf(stdout, "PERROR: cant send more than %d\n",BUFFERSIZE);
+            fprintf(stdout, "ERROR: cant send more than %d\n",BUFFERSIZE);
             continue;
         }
-        if ((numbytes = send(sockfd, argv[arg_c], strlen(argv[arg_c]) + 1, 0)) == 0 || numbytes == -1)
+        printf("[Client] Sending %s, %d bytes to server. . .\n", temp, numbytes);
+        if ((numbytes = send(sockfd, temp, strlen(temp) + 1, 0)) == 0 || numbytes == -1)
         {
-            perror("PERROR: send");
+            perror("ERROR: send");
             exit(1);
         }
+        free(temp);
         if ((numbytes = recv(sockfd, buf, BUFFERSIZE-1, 0)) == -1) {
-            perror("PERROR: recv");
+            perror("ERROR: recv");
             exit(1);
         }
         buf[numbytes] = '\0';
         fprintf(stdout, "OUTPUT: %s\n", buf);
-
     }
-
-    
-    
-
-
     close(sockfd);
 
     return 0;
